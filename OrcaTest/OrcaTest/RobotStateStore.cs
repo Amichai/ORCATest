@@ -85,7 +85,6 @@ namespace OrcaTest {
                     _robotStates[report.RobotID].PushReport(report);
                     return true;
                 } else {
-                    //log.DebugFormat("Update: {0}", report.ID);
                     _robotStates[report.RobotID] = new RobotState(report.RobotID) { LatestReport = report, Acceleration = new Vec2(), Velocity = new Vec2() };
                     return false;
                 }
@@ -95,7 +94,6 @@ namespace OrcaTest {
 
         public RobotState Retrieve(int id) {
             lock (_syncRoot) {
-                //log.DebugFormat("Retrieve: {0}", id);
                 if (_robotStates.ContainsKey(id)) {
                     return _robotStates[id];
                 } else {

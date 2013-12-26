@@ -9,11 +9,8 @@ using ThreeByte.MoMath.Robots.Util;
 
 namespace OrcaTest {
     public class OrcaValidator {
-
         public OrcaValidator() {
-            //this.TerrainMap = new TerrainMap(width, height);
             this.robotstateStore = new RobotStateStore();
-            //this.robotActions = new Dictionary<int, RobotAction>();
         }
 
         public void Reset() {
@@ -21,13 +18,13 @@ namespace OrcaTest {
         }
 
         public static double RobotRadius = 8;
+        //public static double RobotRadius = 13;
 
         class velocityObstacle {
             private Bitmap bitmap;
             Vec2 offsetConeCenter;
             Vec2 originalConeCenter;
             double radius;
-            public Vec2 finiteTimeCutoffVal;
             private bool ptIsInsideCircle(Vec2 pos, Vec2 center, double r) {
                 return (pos.X - center.X).Sqrd() + (pos.Y - center.Y).Sqrd() < r.Sqrd();
             }
@@ -145,9 +142,6 @@ namespace OrcaTest {
             foreach (var o in obstacles) {
                 if (o.IsInsideCone(inputVelocity, robotID, drawingScale, drawingOffset, printOnCollision, out directCollision)) {
                     return true;
-
-                    //return inputVelocity / 2;
-                    //return o.circleBasePoint;
                 }
             }
             return false;
@@ -158,7 +152,6 @@ namespace OrcaTest {
         public Vec2 Validate(Vec2 vel, RobotReport latestReport, out bool directCollision) {
             ///check if the desired action is in the velocity obstacle
             List<velocityObstacle> obstacles = new List<velocityObstacle>();
-            
             foreach (var state in robotstateStore.RobotStates) {
                 if (state.Key == latestReport.RobotID) {
                     continue;
@@ -169,34 +162,14 @@ namespace OrcaTest {
                 Vec2 lastActionVec = this.lastVelocityVector[state.Key];
                 obstacles.Add(new velocityObstacle(posDiff1, radiusSum,
                     lastActionVec, state.Key));
-
-
                 var distance = latestReport.Position.Dist(state.Value.Position);
-                //log.InfoFormat("Distance: {0} id1: {1}, id2: {2}", distance, latestReport.RobotID, state.Key);
-
-                ///First we should check if angle of the velocity vector is within the range of the
-                ///velocity obstacle. 
-
             }
-            //foreach (var o in obstructionsMap.Attractors) {
-            //    var closestPt = o.ClosestPoint(latestReport.Position);
-            //    var posDiff1 = closestPt - latestReport.Position;
-            //    double radius = RobotRadius;
-            //    obstacles.Add(new velocityObstacle(posDiff1, radius * 4,
-            //        Vec2.ZeroVector, -1));
-            //}
             var adjusted = UpdateVelocityVectorFromObstacles(obstacles, vel, latestReport.RobotID, out directCollision);
             ///If we have a new velocity:
             if (adjusted == null) {
                 adjusted =  vel / 100;
             }
-
-            ///if so, calculate the closest velocity outside the obstacle
-            //log.InfoFormat("Latest report: {0}", latestReport.ToString());
-            //log.InfoFormat("Adjusted action: {0}", adjustedAction);
             UpdateRobots(latestReport, adjusted);
-
-            //log.InfoFormat("Adjusted action: {0}", adjustedAction);
             return adjusted;
         }
 
@@ -237,10 +210,12 @@ namespace OrcaTest {
                 return velocity;
             }
             Vec2 newVelocity = null;
-            for (double dttheta = 0.01; dttheta < Math.PI * 2; dttheta += .05) {
+            //for (double dttheta = 0.01; dttheta < Math.PI * 2; dttheta += .05) {
+            //for (double dttheta = 0.01; dttheta < Math.PI / 4; dttheta += .05) {
+            for (double dttheta = 0.01; dttheta < Math.PI; dttheta += .05) {
                 Vec2 inspectionPt;
+                //double magOffset = rand.NextDouble() * (velocity.Mag() * 1.3 + .1);
                 double magOffset = rand.NextDouble() * (velocity.Mag() * 2 + .1);
-
                 if (counter % 2 == 0) {
                     inspectionPt = Vec2.FromAngleAndMagnitude(velocity.AngleFromXAxis() + dttheta, magOffset);
                 } else {
@@ -249,33 +224,12 @@ namespace OrcaTest {
 
                 if (!collision(inspectionPt, obstacles, id, false, out directCollision)) {
                     newVelocity = inspectionPt;
-                    //if (counter > 100) {
-                    //    drawObstructions(obstacles, velocity, newVelocity);
-                    //}
                     break;
-                } else {
-                    //if (counter > 100) {
-                    //    drawObstructions(obstacles, velocity, newVelocity);
-                    //}
                 }
                 counter++;
             }
-
-            //if (newVelocity == null) {
-            //    drawObstructions(obstacles, velocity, newVelocity);
-            //}
-
             return newVelocity;
         }
-
-        private double _ORCAScale = 4;
-        public double ORCAScale {
-            get { return _ORCAScale; }
-            set {
-                _ORCAScale = value;
-            }
-        }
-
 
         private RobotStateStore robotstateStore;
 

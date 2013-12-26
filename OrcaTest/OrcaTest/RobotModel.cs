@@ -84,8 +84,8 @@ namespace OrcaTest {
             double dt = (DateTime.Now - lastMove).TotalSeconds;
             Vec2 dr = new Vec2(targetVelocity.X * dt, targetVelocity.Y * dt);
             this.Heading = dr.AngleFromXAxis();
-            this.X += dr.X;
-            this.Y += dr.Y;
+            this.X += dr.X + (rand.NextDouble() - .5);
+            this.Y += dr.Y + (rand.NextDouble() - .5) ;
 
             var report = new RobotReport() {
                 Yaw = Heading,

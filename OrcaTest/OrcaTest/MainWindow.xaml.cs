@@ -42,15 +42,6 @@ namespace OrcaTest {
             t.Start();
         }
 
-        //private TimeSpan _transmissionPeriod = TimeSpan.FromMilliseconds(50);
-        //public TimeSpan TransmissionPeriod {
-        //    get { return _transmissionPeriod; }
-        //    set {
-        //        _transmissionPeriod = value;
-        //        NotifyPropertyChanged();
-        //    }
-        //}
-
         private ObservableCollection<RobotModel> _Robots;
         public ObservableCollection<RobotModel> Robots {
             get { return _Robots; }
